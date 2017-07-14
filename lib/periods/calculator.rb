@@ -21,14 +21,22 @@ module Periods
       end_date = options[:end_date]
 
       raise ArgumentError.new("period should be within #{VALID_PERIODS}") unless VALID_PERIODS.include?(period)
-      date = calculate_no_of_periods(start_date,Date.today,period)[:date]
+      date = calculate_no_of_periods(start_date, Date.today, period, true)[:date]
       return (end_date && (date > end_date)) ? nil : date
     end
 
-    def calculate_no_of_periods(start_date,end_date,period)
+    # By default, the number of periods calculation will not go passed the end date
+    # So if you start on 1/31/2011 and are doing monthly payments, with and end date at
+    # 1/31/2012, it will return 12 periods and stop at 1/31/2012
+    #
+    # But we also want to be able to calculate the next date after a particular date
+    # By passing in true as the last param, it will not stop until the date after
+    # the end date.
+    def calculate_no_of_periods(start_date, end_date, period, go_one_passed_end_date = false)
+      operator = go_one_passed_end_date ? ">" : ">="
       i = 1
       date = advance(start_date, { period => i })
-      until date > end_date do
+      until date.send(operator, end_date) do
         i += 1
         date = advance(start_date, { period => i })
       end

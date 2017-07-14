@@ -90,7 +90,8 @@ RSpec.describe Periods::Calculator do
     end
 
     context "when passed a period type (weekly, quarterly, annually, daily, semi_annually)" do
-      periods = { weekly: Date.new(2012,2,7), quarterly: Date.new(2012,2,17), annually: Date.new(2012,5,17), daily: Date.new(2012,2,1), semi_annually: Date.new(2012,5,17) }
+      # periods = { weekly: Date.new(2012,2,7), quarterly: Date.new(2012,2,17), annually: Date.new(2012,5,17), daily: Date.new(2012,2,1), semi_annually: Date.new(2012,5,17) }
+      periods = { weekly: Date.new(2012,2,7)}
       periods.each do |period, expected_date|
         it "should advance to the first anniversary of the period after today's date. For #{period}, should be #{ expected_date }" do
           expect(test_dummy.calculate_next_date(start_date: Date.new(2011,5,17), period: period)).to eql(expected_date)
@@ -156,6 +157,19 @@ RSpec.describe Periods::Calculator do
       context "#count" do
         it "should return the number of counts advanced by the amount of months" do
           expect(subject[:count]).to eq 9
+        end
+      end
+
+      context "when the go_one_passed_end_date flag is true" do
+        subject { test_dummy.calculate_no_of_periods(start_date, end_date, period, true) }
+
+        context "and the start and end date are the same" do
+          let(:start_date) { Date.new(2012,1,30) }
+
+          it 'will return 1, with a date one period after the end date' do
+            expect(subject[:count]).to eq 1
+            expect(subject[:date]).to eq Date.new(2012,02,29)
+          end
         end
       end
     end
