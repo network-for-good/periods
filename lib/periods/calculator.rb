@@ -35,11 +35,11 @@ module Periods
       { date: date , count: i }
     end
 
-    def calculate_total_value(recurring_donation)
-      end_date = recurring_donation.end_date || Date.today.next_year.prev_day
-      period = recurring_donation.period.to_sym
+    def calculate_total_value(recurrable)
+      end_date = recurrable.end_date || Date.today.next_year.prev_day
+      period = recurrable.period.to_sym
       no_of_periods = calculate_no_of_periods(Date.today,end_date,period)[:count]
-      total_amount = recurring_donation.total_amount_per_period * no_of_periods
+      total_amount = recurrable.total_amount_per_period * no_of_periods
       { no_of_periods: no_of_periods , total_amount: total_amount, end_date: end_date }
     end
   end
