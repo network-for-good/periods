@@ -21,7 +21,7 @@ module Periods
       end_date = options[:end_date]
 
       raise ArgumentError.new("period should be within #{VALID_PERIODS}") unless VALID_PERIODS.include?(period)
-      date = calculate_no_of_periods(start_date, Date.today, period, true)[:date]
+      date = calculate_no_of_periods(start_date, Date.today, period, go_one_passed_end_date_if_equal: true)[:date]
       return (end_date && (date > end_date)) ? nil : date
     end
 
@@ -32,15 +32,36 @@ module Periods
     # But we also want to be able to calculate the next date after a particular date
     # By passing in true as the last param, it will not stop until the date after
     # the end date.
-    def calculate_no_of_periods(start_date, end_date, period, go_one_passed_end_date = false)
-      operator = go_one_passed_end_date ? ">" : ">="
-      i = 1
-      date = advance(start_date, { period => i })
+    def calculate_no_of_periods(start_date, end_date, period, options = {})
+      { date: all_dates(start_date, end_date, period, options).last , count: all_dates(start_date, end_date, period, options).count }
+    end
+
+    def all_periods_with_amounts(start_date, end_date, period, total)
+      number_of_periods = calculate_no_of_periods(start_date, end_date, period, options = {})[:count]
+      amount_per_period = (total.to_f / number_of_periods.to_f).round(2)
+
+      #adjust the last period so to make up for rounding differences
+      amount_in_last_period = total - (amount_per_period * number_of_periods) + amount_per_period
+
+      all_dates(start_date, end_date, period, options).each_with_index.inject([]) do |arr, (date, index)|
+        amount = (number_of_periods == (index + 1)) ? amount_in_last_period : amount_per_period
+        arr << { date_due: date, amount: amount, sequence: index + 1}
+      end
+    end
+
+    def all_dates(start_date, end_date, period, options = {})
+      go_one_passed_end_date_if_equal = options[:go_one_passed_end_date_if_equal] || false
+      operator = go_one_passed_end_date_if_equal ? ">" : ">="
+      i = 0
+      # date = advance(start_date, { period => i })
+      date = start_date
+      dates = [date]
       until date.send(operator, end_date) do
         i += 1
         date = advance(start_date, { period => i })
+        dates << date
       end
-      { date: date , count: i }
+      dates
     end
 
     def calculate_total_value(recurrable)

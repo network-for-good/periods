@@ -156,21 +156,47 @@ RSpec.describe Periods::Calculator do
 
       context "#count" do
         it "should return the number of counts advanced by the amount of months" do
-          expect(subject[:count]).to eq 9
+          expect(subject[:count]).to eq 10
         end
       end
 
       context "when the go_one_passed_end_date flag is true" do
-        subject { test_dummy.calculate_no_of_periods(start_date, end_date, period, true) }
+        subject { test_dummy.calculate_no_of_periods(start_date, end_date, period, go_one_passed_end_date_if_equal: true) }
 
         context "and the start and end date are the same" do
           let(:start_date) { Date.new(2012,1,30) }
 
-          it 'will return 1, with a date one period after the end date' do
-            expect(subject[:count]).to eq 1
+          it 'will return 2 (includes the start date), with a date one period after the end date' do
+            expect(subject[:count]).to eq 2
             expect(subject[:date]).to eq Date.new(2012,02,29)
           end
         end
+      end
+    end
+
+    describe '#all_periods_with_amounts' do
+
+      before(:each) do
+        Timecop.freeze(Date.new(2012,1,31))
+      end
+      let(:start_date) { Date.new(2011,6,17) }
+      let(:period) { :monthly }
+      let(:end_date) { Date.new(2012,5,17) }
+      let(:total) { 1000 }
+
+      subject { test_dummy.all_periods_with_amounts(start_date, end_date, period, total) }
+
+      it 'should return an array of hashes with the due dates and amounts' do
+        p subject
+        expect(subject.length).to eq(12)
+        expect(subject.first[:date_due]).to eq(Date.new(2011,6,17) )
+        expect(subject.last[:date_due]).to eq(Date.new(2012,5,17) )
+        expect(subject.first[:amount]).to eq((total.to_f/12.to_f).round(2))
+      end
+
+      it 'the sum of all of the amounts should equal the total' do
+        total_sum = subject.inject(0) { |total, elem| total += elem[:amount] }
+        expect(total_sum.round(2)).to eq(total)
       end
     end
 
@@ -186,6 +212,8 @@ RSpec.describe Periods::Calculator do
       let(:end_date) { Date.new(2012,7,30)  }
       let(:period) { 'monthly' }
       let(:total_amount_per_period) { 10 }
+      let(:total_amount) { 10 * 7 } #amount per period * the number of periods
+
 
       subject { test_dummy.calculate_total_value(recurring_donation) }
 
@@ -209,14 +237,15 @@ RSpec.describe Periods::Calculator do
       context "#total_amount" do
 
         it "should return the total_amount paid till the end_date" do
-          expect(subject[:total_amount]).to eq (total_amount_per_period * subject[:no_of_periods])
+          expect(subject[:total_amount]).to eq (total_amount_per_period * 7)
         end
       end
 
       context "#no_of_periods" do
 
         it "should return the total payment frequency + 1 till the end_date" do
-          expect(subject[:no_of_periods]).to eq 6
+          # this includes the start date, typically the first payment
+          expect(subject[:no_of_periods]).to eq 7
         end
       end
     end
