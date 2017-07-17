@@ -187,10 +187,9 @@ RSpec.describe Periods::Calculator do
       subject { test_dummy.all_periods_with_amounts(start_date, end_date, period, total) }
 
       it 'should return an array of hashes with the due dates and amounts' do
-        p subject
         expect(subject.length).to eq(12)
-        expect(subject.first[:date_due]).to eq(Date.new(2011,6,17) )
-        expect(subject.last[:date_due]).to eq(Date.new(2012,5,17) )
+        expect(subject.first[:due_date]).to eq(Date.new(2011,6,17) )
+        expect(subject.last[:due_date]).to eq(Date.new(2012,5,17) )
         expect(subject.first[:amount]).to eq((total.to_f/12.to_f).round(2))
       end
 

@@ -17,7 +17,7 @@ module Periods
 
     def calculate_next_date(options = {})
       start_date  = options[:start_date] || Date.today
-      period = ( options[:period] || :monthly ).to_sym
+      period = (options[:period].nil? || options[:period].empty?) ? :monthly : options[:period].to_sym
       end_date = options[:end_date]
 
       raise ArgumentError.new("period should be within #{VALID_PERIODS}") unless VALID_PERIODS.include?(period)
@@ -33,11 +33,11 @@ module Periods
     # By passing in true as the last param, it will not stop until the date after
     # the end date.
     def calculate_no_of_periods(start_date, end_date, period, options = {})
-      { date: all_dates(start_date, end_date, period, options).last , count: all_dates(start_date, end_date, period, options).count }
+      { date: all_dates(start_date, end_date, period.to_sym, options).last , count: all_dates(start_date, end_date, period.to_sym, options).count }
     end
 
     def all_periods_with_amounts(start_date, end_date, period, total)
-      number_of_periods = calculate_no_of_periods(start_date, end_date, period, options = {})[:count]
+      number_of_periods = calculate_no_of_periods(start_date, end_date, period.to_sym, options = {})[:count]
       amount_per_period = (total.to_f / number_of_periods.to_f).round(2)
 
       #adjust the last period so to make up for rounding differences
@@ -45,7 +45,7 @@ module Periods
 
       all_dates(start_date, end_date, period, options).each_with_index.inject([]) do |arr, (date, index)|
         amount = (number_of_periods == (index + 1)) ? amount_in_last_period : amount_per_period
-        arr << { date_due: date, amount: amount, sequence: index + 1}
+        arr << { due_date: date, amount: amount, sequence: index + 1}
       end
     end
 
@@ -58,7 +58,7 @@ module Periods
       dates = [date]
       until date.send(operator, end_date) do
         i += 1
-        date = advance(start_date, { period => i })
+        date = advance(start_date, { period.to_sym => i })
         dates << date
       end
       dates
@@ -67,7 +67,7 @@ module Periods
     def calculate_total_value(recurrable)
       end_date = recurrable.end_date || Date.today.next_year.prev_day
       period = recurrable.period.to_sym
-      no_of_periods = calculate_no_of_periods(Date.today,end_date,period)[:count]
+      no_of_periods = calculate_no_of_periods(Date.today, end_date, period)[:count]
       total_amount = recurrable.total_amount_per_period * no_of_periods
       { no_of_periods: no_of_periods , total_amount: total_amount, end_date: end_date }
     end
