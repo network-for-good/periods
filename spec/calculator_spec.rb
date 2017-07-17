@@ -149,19 +149,19 @@ RSpec.describe Periods::Calculator do
       subject { test_dummy.calculate_no_of_periods(start_date, end_date, period) }
 
       context "#date" do
-        it "should return the date advanced by the amount of months" do
-          expect(subject[:date]).to eq Date.new(2012,02,17)
+        it "should return the date advanced to the last installment" do
+          expect(subject[:date]).to eq Date.new(2012,01,17)
         end
       end
 
       context "#count" do
         it "should return the number of counts advanced by the amount of months" do
-          expect(subject[:count]).to eq 10
+          expect(subject[:count]).to eq 9
         end
       end
 
       context "when the go_one_passed_end_date flag is true" do
-        subject { test_dummy.calculate_no_of_periods(start_date, end_date, period, go_one_passed_end_date_if_equal: true) }
+        subject { test_dummy.calculate_no_of_periods(start_date, end_date, period, go_one_passed_end_date: true) }
 
         context "and the start and end date are the same" do
           let(:start_date) { Date.new(2012,1,30) }
@@ -208,7 +208,7 @@ RSpec.describe Periods::Calculator do
       let(:recurring_donation) {
         OpenStruct.new( end_date: end_date , total_amount_per_period: total_amount_per_period , period: period )
       }
-      let(:end_date) { Date.new(2012,7,30)  }
+      let(:end_date) { Date.new(2012,7,31)  }
       let(:period) { 'monthly' }
       let(:total_amount_per_period) { 10 }
       let(:total_amount) { 10 * 7 } #amount per period * the number of periods
@@ -233,20 +233,52 @@ RSpec.describe Periods::Calculator do
         end
       end
 
-      context "#total_amount" do
+      context 'when the end_date fails on the anniversary' do
+        let(:end_date) { Date.new(2012,7,31)  }
 
-        it "should return the total_amount paid till the end_date" do
-          expect(subject[:total_amount]).to eq (total_amount_per_period * 7)
+        describe "#total_amount and #num_of_periods" do
+
+          it "should include that end date as one of the installments" do
+            expect(subject[:total_amount]).to eq (total_amount_per_period * 7)
+            expect(subject[:no_of_periods]).to eq 7
+          end
         end
       end
 
-      context "#no_of_periods" do
+      context 'when the end_date is a day before the anniversary' do
+        let(:end_date) { Date.new(2012,7,30)  }
 
-        it "should return the total payment frequency + 1 till the end_date" do
-          # this includes the start date, typically the first payment
-          expect(subject[:no_of_periods]).to eq 7
+        describe "#total_amount and #num_of_periods" do
+
+          it "should NOT include that end date as one of the installments" do
+            expect(subject[:total_amount]).to eq (total_amount_per_period * 6)
+            expect(subject[:no_of_periods]).to eq 6
+          end
         end
       end
+
+      context 'when the end_date is after the anniversary' do
+        let(:end_date) { Date.new(2012,8,1)  }
+
+        describe "#total_amount and #num_of_periods" do
+
+          it "should include that end date as one of the installments" do
+            expect(subject[:total_amount]).to eq (total_amount_per_period * 7)
+            expect(subject[:no_of_periods]).to eq 7
+          end
+        end
+      end
+
+      context 'when the period is a quarter and the end date is 1 year after the start' do
+        let(:period) { "quarterly" }
+        let(:end_date) { Date.new(2013,1,31)  }
+
+        it 'should have 5 installments (includes the 1 year anniversary' do
+          expect(subject[:no_of_periods]).to eq 5
+          expect(subject[:total_amount]).to eq (total_amount_per_period * 5)
+        end
+      end
+
     end
   end
 end

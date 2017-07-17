@@ -21,7 +21,7 @@ module Periods
       end_date = options[:end_date]
 
       raise ArgumentError.new("period should be within #{VALID_PERIODS}") unless VALID_PERIODS.include?(period)
-      date = calculate_no_of_periods(start_date, Date.today, period, go_one_passed_end_date_if_equal: true)[:date]
+      date = calculate_no_of_periods(start_date, Date.today, period, go_one_passed_end_date: true)[:date]
       return (end_date && (date > end_date)) ? nil : date
     end
 
@@ -50,15 +50,19 @@ module Periods
     end
 
     def all_dates(start_date, end_date, period, options = {})
-      go_one_passed_end_date_if_equal = options[:go_one_passed_end_date_if_equal] || false
-      operator = go_one_passed_end_date_if_equal ? ">" : ">="
+      go_one_passed_end_date = options[:go_one_passed_end_date] || false
+
       i = 0
-      # date = advance(start_date, { period => i })
+      dates = []
+      # the start date is the first in the list of installments
       date = start_date
-      dates = [date]
-      until date.send(operator, end_date) do
+      until date > end_date do
+        dates << date
         i += 1
         date = advance(start_date, { period.to_sym => i })
+      end
+
+      if go_one_passed_end_date
         dates << date
       end
       dates
