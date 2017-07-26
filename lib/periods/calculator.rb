@@ -1,7 +1,7 @@
 module Periods
   module Calculator
 
-    VALID_PERIODS = [ :annually, :quarterly, :monthly, :weekly, :daily, :semi_annually]
+    VALID_PERIODS = [:one_time, :monthly, :weekly, :annually, :quarterly, :semi_annually, :daily]
 
     def advance(d, options)
       #based on http://api.rubyonrails.org/v2.3.11/classes/ActiveSupport/CoreExtensions/Date/Calculations.html#M000918
