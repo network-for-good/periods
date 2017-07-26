@@ -186,16 +186,27 @@ RSpec.describe Periods::Calculator do
 
       subject { test_dummy.all_periods_with_amounts(start_date, end_date, period, total) }
 
-      it 'should return an array of hashes with the due dates and amounts' do
-        expect(subject.length).to eq(12)
-        expect(subject.first[:due_date]).to eq(Date.new(2011,6,17) )
-        expect(subject.last[:due_date]).to eq(Date.new(2012,5,17) )
-        expect(subject.first[:amount]).to eq((total.to_f/12.to_f).round(2))
+      context 'when the period is monthly' do
+        it 'should return an array of hashes with the due dates and amounts' do
+          expect(subject.length).to eq(12)
+          expect(subject.first[:due_date]).to eq(Date.new(2011,6,17) )
+          expect(subject.last[:due_date]).to eq(Date.new(2012,5,17) )
+          expect(subject.first[:amount]).to eq((total.to_f/12.to_f).round(2))
+        end
+
+        it 'the sum of all of the amounts should equal the total' do
+          total_sum = subject.inject(0) { |total, elem| total += elem[:amount] }
+          expect(total_sum.round(2)).to eq(total)
+        end
       end
 
-      it 'the sum of all of the amounts should equal the total' do
-        total_sum = subject.inject(0) { |total, elem| total += elem[:amount] }
-        expect(total_sum.round(2)).to eq(total)
+      context 'when the period is one_time' do
+        let(:period) { :one_time }
+
+        it 'should return a single element array with a due date equal to the end date' do
+          expect(subject.length).to eq(1)
+          expect(subject.first[:due_date]).to eq(end_date)
+        end
       end
     end
 

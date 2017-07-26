@@ -50,6 +50,7 @@ module Periods
     end
 
     def all_dates(start_date, end_date, period, options = {})
+      return [end_date] if period == :one_time
       go_one_passed_end_date = options[:go_one_passed_end_date] || false
 
       i = 0
