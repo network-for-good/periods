@@ -43,7 +43,7 @@ module Periods
       #adjust the last period so to make up for rounding differences
       amount_in_last_period = total - (amount_per_period * number_of_periods) + amount_per_period
 
-      all_dates(start_date, end_date, period, options).each_with_index.inject([]) do |arr, (date, index)|
+      all_dates(start_date, end_date, period.to_sym, options).each_with_index.inject([]) do |arr, (date, index)|
         amount = (number_of_periods == (index + 1)) ? amount_in_last_period : amount_per_period
         arr << { due_date: date, amount: amount, sequence: index + 1}
       end
