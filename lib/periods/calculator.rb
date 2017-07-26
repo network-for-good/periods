@@ -20,7 +20,6 @@ module Periods
       period = (options[:period].nil? || options[:period].empty?) ? :monthly : options[:period].to_sym
       end_date = options[:end_date]
 
-      raise ArgumentError.new("period should be within #{VALID_PERIODS}") unless VALID_PERIODS.include?(period)
       date = calculate_no_of_periods(start_date, Date.today, period, go_one_passed_end_date: true)[:date]
       return (end_date && (date > end_date)) ? nil : date
     end
@@ -50,6 +49,7 @@ module Periods
     end
 
     def all_dates(start_date, end_date, period, options = {})
+      raise ArgumentError.new("period should be within #{VALID_PERIODS}") unless VALID_PERIODS.include?(period)
       return [end_date] if period == :one_time
       go_one_passed_end_date = options[:go_one_passed_end_date] || false
 
