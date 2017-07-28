@@ -208,6 +208,17 @@ RSpec.describe Periods::Calculator do
           expect(subject.first[:due_date]).to eq(end_date)
         end
       end
+
+      context "when the end date is on the anniversary of the period" do
+        let(:start_date) { Date.new(2011,1,30) }
+        let(:period) { :monthly }
+        let(:end_date) { Date.new(2011,6,30) }
+        let(:total) { 1000 }
+
+        it 'the last period should be on the end date' do
+          expect(subject.last[:due_date]).to eql(Date.new(2011,6,30))
+        end
+      end
     end
 
     describe "#calculate_total_value" do
