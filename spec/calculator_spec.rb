@@ -222,19 +222,18 @@ RSpec.describe Periods::Calculator do
     end
 
     describe "#calculate_total_value" do
-
-      before(:each) do
-        Timecop.freeze(Date.new(2012,1,31))
-      end
+      let(:start_date) { Date.new(2012,1,31) }
 
       let(:recurring_donation) {
-        OpenStruct.new( end_date: end_date , total_amount_per_period: total_amount_per_period , period: period )
+        OpenStruct.new( activated_at: activated_at, end_date: end_date , total_amount_per_period: total_amount_per_period , period: period )
       }
+      let(:activated_at) { nil }
       let(:end_date) { Date.new(2012,7,31)  }
       let(:period) { 'monthly' }
       let(:total_amount_per_period) { 10 }
       let(:total_amount) { 10 * 7 } #amount per period * the number of periods
 
+      before(:each) { Timecop.freeze(start_date) }
 
       subject { test_dummy.calculate_total_value(recurring_donation) }
 
@@ -251,6 +250,21 @@ RSpec.describe Periods::Calculator do
 
           it "should return recurring_donation end date" do
             expect(subject[:end_date]).to eq end_date
+          end
+
+          context "When activated_at is not null" do
+            let(:activated_at) { start_date }
+            it "should return the correct number of periods a month later" do
+              Timecop.freeze(start_date + 15) do
+                expect(subject[:no_of_periods]).to eql 7
+              end
+            end
+          end
+
+          context "When activated_at is null" do
+            it "returns the correct number of periods" do
+              expect(subject[:no_of_periods]).to eql 7
+            end
           end
         end
       end
