@@ -71,8 +71,9 @@ module Periods
 
     def calculate_total_value(recurrable)
       end_date = recurrable.end_date || Date.today.next_year.prev_day
+      start_date = recurrable.activated_at || Date.today
       period = recurrable.period.to_sym
-      no_of_periods = calculate_no_of_periods(Date.today, end_date, period)[:count]
+      no_of_periods = calculate_no_of_periods(start_date, end_date, period)[:count]
       total_amount = recurrable.total_amount_per_period * no_of_periods
       { no_of_periods: no_of_periods , total_amount: total_amount, end_date: end_date }
     end
