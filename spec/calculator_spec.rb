@@ -44,7 +44,7 @@ RSpec.describe Periods::Calculator do
       let(:date) { Date.new(2012,2,07) }
       let(:options) { { semi_annually: 3} }
 
-      it "should return the date advanced by the amount of years" do
+      it "should return the date advanced by the amount of months" do
         expect(subject).to eql(Date.new(2013,8,7))
       end
     end
@@ -64,6 +64,15 @@ RSpec.describe Periods::Calculator do
 
       it "should return the date advanced by the amount of days" do
         expect(subject).to eql(Date.new(2012,2,17))
+      end
+    end
+
+    context "when passed a every_two_weeks option" do
+      let(:date) { Date.new(2012,2,13) }
+      let(:options) { { every_two_weeks: 3} }
+
+      it "should return the date advanced by the amount of weeks" do
+        expect(subject).to eql(Date.new(2012,3,26))
       end
     end
   end
