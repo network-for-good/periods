@@ -21,11 +21,11 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "rails", "~> 5.0"
+  spec.add_dependency "rails", "~> 7.0"
 
-  spec.add_development_dependency "bundler", "~> 2.1.4"
-  spec.add_development_dependency "rake", "~> 10.0"
-  spec.add_development_dependency "rspec", "~> 3.0"
+  spec.add_development_dependency "bundler", "~> 2.5.23"
+  spec.add_development_dependency "rake", "~> 13.0"
+  spec.add_development_dependency "rspec", "~> 3.12.0"
   spec.add_development_dependency "timecop"
 
 end
