@@ -1,5 +1,5 @@
-# Keeps the SHA-pinned reusable workflows (network-for-good/nfg-devx) and any other pinned action
-# current, so pins do not go stale (ITD-003, NFG-5012).
+# Keeps the SHA-pinned actions used by the workflows in this repo current, so pins do not go stale
+# (ITD-003, NFG-5012).
 version: 2
 updates:
   - package-ecosystem: github-actions

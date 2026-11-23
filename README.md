@@ -32,12 +32,15 @@ GitHub Actions runs everything; there is no CircleCI, Travis or Solano config fo
 
 | Workflow | Runs on | Does |
 | --- | --- | --- |
-| `.github/workflows/test.yml` | every pull request targeting `main` | Runs `bundle exec rspec`. Reports the check `test / test`. |
+| `.github/workflows/test.yml` | every pull request targeting `main` (and called by the publish workflow) | Runs `bundle exec rspec`. Reports the check `test`. |
 | `.github/workflows/publish-gem.yml` | every push to `main` | Runs the tests, then publishes the gem to GitHub Packages and tags the release, but only if the version is new. |
 
-Both are thin callers of the shared gem workflows in
-[`nfg-devx`](https://github.com/network-for-good/nfg-devx) (`docs/gem-workflows.md` there has the full
-description), pinned to a full commit SHA. Dependabot proposes updates to that pin.
+These are in-repo copies of the shared gem workflows in the private
+[`nfg-devx`](https://github.com/network-for-good/nfg-devx) repository (`docs/gem-workflows.md` there
+describes them), taken at `gem-workflows-v1.0.0`. `periods` is a public repository and cannot call
+workflows stored in a private one, so the copy is interim until a shared public workflows repository
+exists. The build job runs with a read-only token; only the small publish job can write packages and
+tags. Actions are pinned to full commit SHAs, and Dependabot proposes updates to them.
 
 **What triggers a release.** Versions are not computed from commit messages. To release, bump
 `VERSION` in `lib/periods/version.rb` in your pull request. When that PR merges to `main` and the
