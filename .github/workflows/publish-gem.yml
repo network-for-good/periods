@@ -1,0 +1,37 @@
+name: Publish gem to GitHub Packages
+
+# Runs on every push to main. Whether a merge "warrants a release" is decided by the version itself:
+# the author of a change bumps lib/periods/version.rb in the PR when a release is warranted, and the
+# shared workflow publishes and tags v<version> only if that tag does not exist yet. A merge that
+# does not change the version publishes nothing (see "CI and Releasing" in README.md).
+#
+# The test suite gates the release (`needs: test`). The shared publish workflow builds the gem with a
+# read-only token and publishes with the workflow's own GITHUB_TOKEN in a separate job (NFG-5012).
+# Both reusable workflows are pinned to a full commit SHA (NFG-4979).
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    uses: network-for-good/nfg-devx/.github/workflows/gem-test.yml@586acd68bdc210adda991b27b77ff9239da67e26 # gem-workflows-v1.0.0
+    with:
+      ruby_version: '3.4.2'
+
+  publish:
+    needs: test # a red suite on main stops the release
+    permissions:
+      contents: write
+      packages: write
+    uses: network-for-good/nfg-devx/.github/workflows/gem-publish.yml@586acd68bdc210adda991b27b77ff9239da67e26 # gem-workflows-v1.0.0
+    with:
+      ruby_version: '3.4.2'
+      gem_name: periods
+      version_file: lib/periods/version.rb
+      version_const: Periods::VERSION
+      tag_prefix: v

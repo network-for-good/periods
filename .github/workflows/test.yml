@@ -1,0 +1,22 @@
+name: Test
+
+# Runs the gem's RSpec suite on every pull request targeting main. The test logic lives once in
+# network-for-good/nfg-devx (NFG-4979); this file is only the caller. The called job is named `test`,
+# so the check reports as `test / test`.
+#
+# The reusable workflow is pinned to a full commit SHA, with its release tag in a comment: a change
+# there affects every caller. Dependabot (.github/dependabot.yml) proposes updates to the pin.
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    uses: network-for-good/nfg-devx/.github/workflows/gem-test.yml@586acd68bdc210adda991b27b77ff9239da67e26 # gem-workflows-v1.0.0
+    with:
+      ruby_version: '3.4.2'
