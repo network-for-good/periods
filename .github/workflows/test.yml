@@ -1,0 +1,56 @@
+name: Test
+
+# Runs the gem's RSpec suite on every pull request targeting main, and is also called by
+# publish-gem.yml so a red suite on main stops a release.
+#
+# Interim copy of network-for-good/nfg-devx .github/workflows/gem-test.yml at
+# 586acd68bdc210adda991b27b77ff9239da67e26 (gem-workflows-v1.0.0), NFG-4979. nfg-devx is private and
+# periods is public, so this repo cannot call the shared workflow (GitHub does not let a public
+# repository use a reusable workflow from a private one). Replace this file with a thin caller once a
+# shared public workflows repo exists, or periods becomes internal (planned by Platform) and can call
+# the shared workflow directly.
+#
+# Same hardening as the shared workflow: read-only token (NFG-5012), actions pinned to full commit SHAs
+# with the version in a comment (ITD-003), and a pinned runner image so a runner-label change cannot
+# break a release (NFG-5011). Dependabot (.github/dependabot.yml) keeps the pins current.
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: test
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      # actions/checkout v7.0.1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      # ruby/setup-ruby v1.338.0
+      - uses: ruby/setup-ruby@b3aaceaef7e0ee231b499e7b5f49c03fc1d32199
+        with:
+          ruby-version: '3.4.2'
+          bundler-cache: true
+
+      - name: Run test suite
+        run: |
+          mkdir -p tmp/test-results
+          bundle exec rspec
+
+      # actions/upload-artifact v7.0.2
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: periods-test-results
+          path: tmp/test-results
+          if-no-files-found: ignore
