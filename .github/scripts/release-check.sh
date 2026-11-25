@@ -4,7 +4,8 @@
 # Copied verbatim from network-for-good/nfg-devx, .github/workflows/gem-publish.yml (the "Check whether
 # this version was already published" step) at 586acd68bdc210adda991b27b77ff9239da67e26
 # (gem-workflows-v1.0.0). Interim copy: nfg-devx is private and periods is public, so this repo cannot
-# call the shared workflow. Replace it with a thin caller once a shared public workflows repo exists.
+# call the shared workflow. Replace it with a thin caller once a shared public workflows repo exists, or
+# once periods becomes internal (planned by Platform) and can call nfg-devx directly.
 #
 # Decides what a push to a release branch needs: nothing, a publish, or only a missing release tag.
 # READ-ONLY: it never pushes anything. The publish job (the only one holding write credentials)

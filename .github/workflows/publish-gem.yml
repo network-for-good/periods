@@ -8,7 +8,8 @@ name: Publish gem to GitHub Packages
 # Interim copy of network-for-good/nfg-devx .github/workflows/gem-publish.yml at
 # 586acd68bdc210adda991b27b77ff9239da67e26 (gem-workflows-v1.0.0), NFG-4979, with the gem's inputs
 # filled in. nfg-devx is private and periods is public, so this repo cannot call the shared workflow.
-# Replace this file with a thin caller once a shared public workflows repo exists. The release-check
+# Replace this file with a thin caller once a shared public workflows repo exists, or once periods
+# becomes internal (planned by Platform) and can call nfg-devx directly. The release-check
 # logic lives in .github/scripts/release-check.sh, copied from the same source.
 #
 # Least privilege (NFG-5012): the `build` job runs repository code (bundle install, rake build) with a

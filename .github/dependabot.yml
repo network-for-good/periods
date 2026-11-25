@@ -6,3 +6,11 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    ignore:
+      # Deliberate: the org Actions allowlist accepts only ruby/setup-ruby@v1 and the v1.338.0 SHA
+      # (b3aaceaef7e0ee231b499e7b5f49c03fc1d32199). A Dependabot bump to any other SHA would fail with
+      # startup_failure, and a manual allowlist PR per bump is not acceptable to Platform. Until
+      # Platform DevOps classifies ruby/setup-ruby as a trusted vendor under ITD-003, bump it BY HAND:
+      # allowlist the new SHA in bonterra-github-iac first, then update every `ruby/setup-ruby@<sha>`
+      # pin in .github/workflows/ in the same PR.
+      - dependency-name: "ruby/setup-ruby"

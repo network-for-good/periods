@@ -38,9 +38,12 @@ GitHub Actions runs everything; there is no CircleCI, Travis or Solano config fo
 These are in-repo copies of the shared gem workflows in the private
 [`nfg-devx`](https://github.com/network-for-good/nfg-devx) repository (`docs/gem-workflows.md` there
 describes them), taken at `gem-workflows-v1.0.0`. `periods` is a public repository and cannot call
-workflows stored in a private one, so the copy is interim until a shared public workflows repository
+workflows stored in a private one, so the copy is interim until periods becomes internal (planned by
+Platform) and can call the shared workflows directly, or a shared public workflows repository
 exists. The build job runs with a read-only token; only the small publish job can write packages and
-tags. Actions are pinned to full commit SHAs, and Dependabot proposes updates to them.
+tags. Actions are pinned to full commit SHAs, and Dependabot proposes updates to them, except
+`ruby/setup-ruby`, which is bumped by hand because the org Actions allowlist only accepts specific
+SHAs (see the comment in `.github/dependabot.yml`).
 
 **What triggers a release.** Versions are not computed from commit messages. To release, bump
 `VERSION` in `lib/periods/version.rb` in your pull request. When that PR merges to `main` and the

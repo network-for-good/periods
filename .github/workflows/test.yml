@@ -7,7 +7,8 @@ name: Test
 # 586acd68bdc210adda991b27b77ff9239da67e26 (gem-workflows-v1.0.0), NFG-4979. nfg-devx is private and
 # periods is public, so this repo cannot call the shared workflow (GitHub does not let a public
 # repository use a reusable workflow from a private one). Replace this file with a thin caller once a
-# shared public workflows repo exists.
+# shared public workflows repo exists, or periods becomes internal (planned by Platform) and can call
+# the shared workflow directly.
 #
 # Same hardening as the shared workflow: read-only token (NFG-5012), actions pinned to full commit SHAs
 # with the version in a comment (ITD-003), and a pinned runner image so a runner-label change cannot
